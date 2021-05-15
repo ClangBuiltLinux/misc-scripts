@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+trap 'exit' INT
+
 # Make sure we have the required binaries
 for NAME in podman docker; do
     command -v "${NAME}" &>/dev/null && BINARY=${NAME}
@@ -10,17 +12,18 @@ if [[ -z ${BINARY} ]]; then
 fi
 
 DOCKER_DISTROS=(
-    archlinux/base:latest
+    archlinux/archlinux
+    debian:oldstable-slim
     debian:stable-slim
     debian:testing-slim
     debian:unstable-slim
-    fedora:latest
+    fedora
     fedora:rawhide
-    opensuse/leap:latest
-    opensuse/tumbleweed:latest
+    opensuse/leap
+    opensuse/tumbleweed
     ubuntu:18.04
     ubuntu:20.04
-    ubuntu:latest
+    ubuntu
     ubuntu:rolling
     ubuntu:devel
 )
@@ -60,6 +63,7 @@ chmod +x "${RUN_SCRIPT}"
 
 rm "${BASE}"/results.log
 for DISTRO in "${DOCKER_DISTROS[@]}"; do
+    DISTRO=docker.io/${DISTRO}
     "${BINARY}" pull "${DISTRO}"
     "${BINARY}" run \
         --rm \
