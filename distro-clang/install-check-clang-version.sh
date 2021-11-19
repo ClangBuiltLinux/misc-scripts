@@ -29,4 +29,4 @@ elif is_installed zypper; then
     zypper -n in clang
 fi
 
-echo "$1: $(clang --version | head -n1)" >> "$results"
+echo "$1: $(clang --version | head -n1)" >>"$results"
