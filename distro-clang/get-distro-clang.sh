@@ -64,7 +64,7 @@ distros=(
 base=$(dirname "$(readlink -f "$0")")
 results=$base/results.log
 
-rm "$results"
+rm -f "$results"
 
 for distro in "${distros[@]}"; do
     distro=docker.io/$distro
