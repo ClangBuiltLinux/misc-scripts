@@ -1,26 +1,30 @@
 #!/usr/bin/env bash
 
+function is_installed() {
+    command -v "$1" &>/dev/null
+}
+
 results=$(dirname "$(readlink -f "${0}")")/results.log
 
 set -x
 
 # Debian/Ubuntu
-if command -v apt-get &>/dev/null; then
+if is_installed apt-get; then
     export DEBIAN_FRONTEND=noninteractive
 
     apt-get update
     apt-get upgrade -y
     apt-get install --no-install-recommends -y clang
 # Fedora
-elif command -v dnf &>/dev/null; then
+elif is_installed dnf; then
     dnf update -y
     dnf install -y clang
 # Arch
-elif command -v pacman &>/dev/null; then
+elif is_installed pacman; then
     pacman -Syyu --noconfirm
     pacman -S --noconfirm clang
 # OpenSUSE Leap/Tumbleweed
-elif command -v zypper &>/dev/null; then
+elif is_installed zypper; then
     zypper -n up
     zypper -n in clang
 fi
