@@ -79,4 +79,5 @@ for distro in "${distros[@]}"; do
 done
 
 echo
+sed -i 's;docker.io/;;g' "$results"
 cat "$results"
