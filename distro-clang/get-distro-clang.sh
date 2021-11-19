@@ -29,39 +29,9 @@ DOCKER_DISTROS=(
 )
 
 BASE=$(dirname "$(readlink -f "${0}")")
-RUN_SCRIPT=${BASE}/run.sh
-
-cat <<'EOF' >"${RUN_SCRIPT}"
-#!/usr/bin/env bash
-
-RESULTS=$(dirname "$(readlink -f "${0}")")/results.log
-
-set -x
-
-# Debian/Ubuntu
-if command -v apt-get &>/dev/null; then
-    apt-get update
-    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y clang
-# Fedora
-elif command -v dnf &>/dev/null; then
-    dnf update -y
-    dnf install -y clang
-# Arch
-elif command -v pacman &>/dev/null; then
-    pacman -Syyu --noconfirm
-    pacman -S --noconfirm clang
-# OpenSUSE Leap/Tumbleweed
-elif command -v zypper &>/dev/null; then
-    zypper -n up
-    zypper -n in clang
-fi
-
-echo "${1}: $(clang --version | head -n1)" >> "${RESULTS}"
-EOF
-chmod +x "${RUN_SCRIPT}"
 
 rm "${BASE}"/results.log
+
 for DISTRO in "${DOCKER_DISTROS[@]}"; do
     DISTRO=docker.io/${DISTRO}
     "${BINARY}" pull "${DISTRO}"
@@ -71,7 +41,7 @@ for DISTRO in "${DOCKER_DISTROS[@]}"; do
         --volume="${BASE}:${BASE}" \
         --workdir="${BASE}" \
         "${DISTRO}" \
-        "${BASE}"/run.sh "${DISTRO}"
+        "${BASE}"/install-check-clang-version.sh "${DISTRO}"
 done
 
 echo
