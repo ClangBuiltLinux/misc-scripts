@@ -3,10 +3,10 @@
 trap 'exit' INT
 
 # Make sure we have the required binaries
-for NAME in podman docker; do
-    command -v "${NAME}" &>/dev/null && BINARY=${NAME}
+for name in podman docker; do
+    command -v "$name" &>/dev/null && binary=$name
 done
-if [[ -z ${BINARY} ]]; then
+if [[ -z $binary ]]; then
     echo "Neither podman nor docker could be found on your system! Please install one to use this script."
     exit 1
 fi
@@ -37,7 +37,7 @@ fi
 # Tags such as "latest", "stable", or "rolling" are preferred so that the list
 # does not have to be constantly updated. Old but supported releases like
 # Fedora or OpenSUSE are the exception.
-DOCKER_DISTROS=(
+distros=(
     archlinux:latest
 
     debian:oldoldstable-slim
@@ -61,21 +61,22 @@ DOCKER_DISTROS=(
     ubuntu:devel
 )
 
-BASE=$(dirname "$(readlink -f "${0}")")
+base=$(dirname "$(readlink -f "$0")")
+results=$base/results.log
 
-rm "${BASE}"/results.log
+rm "$results"
 
-for DISTRO in "${DOCKER_DISTROS[@]}"; do
-    DISTRO=docker.io/${DISTRO}
-    "${BINARY}" pull "${DISTRO}"
-    "${BINARY}" run \
+for distro in "${distros[@]}"; do
+    distro=docker.io/$distro
+    "$binary" pull "$distro"
+    "$binary" run \
         --rm \
         --init \
-        --volume="${BASE}:${BASE}" \
-        --workdir="${BASE}" \
-        "${DISTRO}" \
-        "${BASE}"/install-check-clang-version.sh "${DISTRO}"
+        --volume="$base:$base" \
+        --workdir="$base" \
+        "$distro" \
+        "$base"/install-check-clang-version.sh "$distro"
 done
 
 echo
-cat "${BASE}"/results.log
+cat "$results"

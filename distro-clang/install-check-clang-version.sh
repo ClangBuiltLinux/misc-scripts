@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-RESULTS=$(dirname "$(readlink -f "${0}")")/results.log
+results=$(dirname "$(readlink -f "${0}")")/results.log
 
 set -x
 
@@ -23,4 +23,4 @@ elif command -v zypper &>/dev/null; then
     zypper -n in clang
 fi
 
-echo "${1}: $(clang --version | head -n1)" >> "${RESULTS}"
+echo "$1: $(clang --version | head -n1)" >> "$results"
