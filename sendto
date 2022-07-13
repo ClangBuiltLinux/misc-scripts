@@ -1,0 +1,62 @@
+#! /usr/bin/python3
+import subprocess
+import sys
+from os.path import exists
+GET_MAINTAINER_PATH = "./scripts/get_maintainer.pl"
+if not exists(GET_MAINTAINER_PATH):
+    raise Exception(f"Can't find {GET_MAINTAINER_PATH}, "
+    "are you in linux directory?"
+    )
+
+argv = sys.argv
+if len(argv) < 2:
+    raise Exception("Usage: $ sendto <patch_file>")
+if argv[1][-6:] != '.patch':
+    raise Exception("Need .patch file (check arg)")
+cmd = [f"{GET_MAINTAINER_PATH}", argv[1]]
+try:
+    result = subprocess.run(cmd, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+except:
+    print(f"subprocess.run failure... "
+    "Potentially lacking permissions for {GET_MAINTAINER_PATH}"
+    )
+
+get_maintainer_output = result.stdout.decode('UTF-8')
+get_maintainer_errors = result.stderr.decode('UTF-8')
+if len(get_maintainer_errors):
+    raise Exception(f"error in {GET_MAINTAINER_PATH}, check patch file")
+
+lines = []
+for line in get_maintainer_output.split('\n')[:-1]:
+    line = line.strip()
+    idx_of_paren = line.index('(')
+    before = line[0:idx_of_paren-1]
+    before = before.replace('"', '')
+    after = line[idx_of_paren+1:-1] 
+    lines.append((before, after))
+
+TO = '--to '
+CC = '--cc '
+send_info = []
+for (before, after) in lines:
+    is_maintainer = ('maintainer' in after)
+    res = (TO if is_maintainer else CC) + f'"{before}"'
+    send_info.append(res)
+
+warns = []
+clean = " \\\n".join(send_info)
+if '--to' not in clean and '--cc' not in clean:
+    warns.append(f"No recipients, manually check {GET_MAINTAINER_PATH}")
+elif '--to' not in clean:
+    warns.append(f"Lack of --to, manually check {GET_MAINTAINER_PATH}")
+
+output = \
+f'''
+git send-email \\
+{clean} {argv[1]}
+
+{''.join(f'# Warning: {warn}' for warn in warns)}
+{get_maintainer_errors}
+'''
+print(output, end='')
