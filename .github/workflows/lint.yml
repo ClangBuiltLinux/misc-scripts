@@ -1,6 +1,12 @@
-# Run shellcheck and shfmt
-name: Lint checks
-on: [push, pull_request]
+# Run shellcheck and shfmt                                                                                                                                                                                                                                    ▎     ▎
+name: Lint Checks
+on:
+  push:
+    paths-ignore:
+      - '**.py'
+  pull_request:
+    paths-ignore:
+      - '**.py'
 jobs:
   shellcheck:
     uses: ClangBuiltLinux/actions-workflows/.github/workflows/shellcheck.yml@main
