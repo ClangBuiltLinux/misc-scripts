@@ -16,11 +16,6 @@ class Colors:
     MAGENTA = "\u001b[35m"
 
 
-# ]]]]]]]]]] this comment is necessary because my lsp thinks all those unclosed
-# square brackets from the escape codes are not in a string and thus my
-# auto-indent is broken (hence, why I closed them all in a comment) (vim is weird.)
-
-
 def error(msg: str) -> None:
     print(f"{Colors.FAIL}[ERROR]{Colors.ENDC} {msg}")
     exit(1)
