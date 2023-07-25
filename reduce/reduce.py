@@ -7,15 +7,12 @@
 # -------------------------------------
 
 import argparse
-from collections.abc import Callable
 import sys
 
 from src import flags, prep
 
 
 VERSION = "0.2.1"
-
-ENTRY_POINTS: dict[str, Callable] = {"prep": prep.main, "flags": flags.main}
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -57,9 +54,7 @@ def parse_cli_args() -> argparse.Namespace:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
