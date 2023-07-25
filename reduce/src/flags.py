@@ -121,7 +121,7 @@ class FlagReducer:
         """
         info("Using cvise to reduce flags")
         chdir(self.cli_args.path_to_flags)
-        command = ["cvise", self.flags_sh.name, self.flags_txt.name]
+        command = ["cvise-delta", self.flags_sh.name, self.flags_txt.name]
         result = subprocess.run(command, stdout=subprocess.PIPE)
         if result.returncode != 0:
             error(
